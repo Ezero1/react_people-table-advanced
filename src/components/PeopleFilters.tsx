@@ -7,14 +7,12 @@ import { getSearchWith } from '../utils/searchHelper';
 export const PeopleFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Дістаємо поточні значення з URL
   const query = searchParams.get('query') || '';
-  const currentSex = searchParams.get('sex'); // 'm', 'f' або null
-  const centuries = searchParams.getAll('centuries'); // масив ['16', '18']
+  const currentSex = searchParams.get('sex');
+  const centuries = searchParams.getAll('centuries');
 
-  // Обробник для текстового пошуку
   function handleQueryChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const newQuery = event.target.value || null; // Якщо пусто — видаляємо (null)
+    const newQuery = event.target.value || null;
     const newSearch = getSearchWith(searchParams, { query: newQuery });
 
     setSearchParams(newSearch);
@@ -39,7 +37,7 @@ export const PeopleFilters = () => {
 
       <p className="panel-tabs" data-cy="SexFilter">
         <SearchLink
-          params={{ sex: null }} // null видаляє sex з URL
+          params={{ sex: null }}
           className={classNames({ 'is-active': !currentSex })}
         >
           All
@@ -58,7 +56,6 @@ export const PeopleFilters = () => {
         </SearchLink>
       </p>
 
-      {/* Текстовий пошук */}
       <div className="panel-block">
         <p className="control has-icons-left">
           <input
@@ -76,7 +73,6 @@ export const PeopleFilters = () => {
         </p>
       </div>
 
-      {/* Фільтр століть */}
       <div className="panel-block">
         <div className="level is-flex-grow-1 is-mobile" data-cy="CenturyFilter">
           <div className="level-left">
@@ -85,7 +81,7 @@ export const PeopleFilters = () => {
                 key={cent}
                 data-cy="century"
                 className={classNames('button mr-1', {
-                  'is-info': centuries.includes(cent.toString()), // Синє, якщо активно
+                  'is-info': centuries.includes(cent.toString()),
                 })}
                 params={getCenturyParams(cent)}
               >
@@ -95,7 +91,6 @@ export const PeopleFilters = () => {
           </div>
 
           <div className="level-right ml-4">
-            {/* Кнопка "Всі" просто видаляє параметр centuries з URL */}
             <SearchLink
               data-cy="centuryALL"
               className="button is-success is-outlined"
@@ -107,7 +102,6 @@ export const PeopleFilters = () => {
         </div>
       </div>
 
-      {/* Скидання всіх фільтрів (видаляємо всі ключі, пов'язані з фільтрацією) */}
       <div className="panel-block">
         <SearchLink
           className="button is-link is-outlined is-fullwidth"

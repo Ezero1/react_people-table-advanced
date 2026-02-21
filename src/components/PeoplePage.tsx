@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/indent */
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Person } from '../types/Person';
 import { getPeople } from '../api';
-import { Loader } from './Loader/Loader';
+import { Loader } from './Loader';
 import { PeopleFilters } from './PeopleFilters';
 import { PeopleTable } from './PeopleTable';
+
+const validSortFields = ['name', 'sex', 'born', 'died'];
 
 export const PeoplePage: React.FC = () => {
   const [people, setPeople] = useState<Person[]>([]);
@@ -15,7 +18,12 @@ export const PeoplePage: React.FC = () => {
   const query = searchParams.get('query')?.toLowerCase() || '';
   const sexFilter = searchParams.get('sex');
   const centuriesFilter = searchParams.getAll('centuries');
-  const sortField = searchParams.get('sort') as keyof Person | null;
+
+  const rawSortField = searchParams.get('sort');
+  const sortField = validSortFields.includes(rawSortField as string)
+    ? (rawSortField as keyof Person)
+    : null;
+
   const sortOrder = searchParams.get('order');
 
   useEffect(() => {
@@ -59,15 +67,15 @@ export const PeoplePage: React.FC = () => {
       const valueA = a[sortField];
       const valueB = b[sortField];
 
-      if (valueA === null && valueB === null) {
+      if (valueA == null && valueB == null) {
         return 0;
       }
 
-      if (valueA === null) {
+      if (valueA == null) {
         return 1;
       }
 
-      if (valueB === null) {
+      if (valueB == null) {
         return -1;
       }
 
@@ -82,7 +90,6 @@ export const PeoplePage: React.FC = () => {
       return 0;
     });
 
-    // Якщо напрямок сортування - спадання (desc), розвертаємо масив
     if (sortOrder === 'desc') {
       visiblePeople.reverse();
     }
@@ -94,7 +101,7 @@ export const PeoplePage: React.FC = () => {
 
       <div className="columns">
         <div className="column is-one-third">
-          {people.length > 0 && <PeopleFilters />}
+          {!isLoading && !error && <PeopleFilters />}
         </div>
 
         <div className="column">
@@ -111,9 +118,16 @@ export const PeoplePage: React.FC = () => {
               <PeopleTable people={visiblePeople} />
             )}
 
-            {!isLoading && !error && visiblePeople.length === 0 && (
+            {!isLoading && !error && people.length === 0 && (
               <p data-cy="noPeopleMessage">There are no people on the server</p>
             )}
+
+            {!isLoading &&
+              !error &&
+              people.length > 0 &&
+              visiblePeople.length === 0 && (
+                <p data-cy="noPeopleMessage">No people found</p>
+              )}
           </div>
         </div>
       </div>
